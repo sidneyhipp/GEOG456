@@ -1,0 +1,19 @@
+body {
+    background-color:darkseagreen;
+}
+
+.daYellowBox{
+    position:absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 25%;
+    background-color:khaki;
+}
+
+h1 {
+    cursor: cell;
+    position: relative;
+    text-align: center;
+    top: 25%;
+}
