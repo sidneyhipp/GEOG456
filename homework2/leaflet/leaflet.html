@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+crossorigin=""/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+crossorigin=""></script>
+
+<style>
+    #map 
+        { height: 500px; width: 500px}
+</style>
+
+<body>
+    
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([35.228093027079076, -80.8396339416504], 13);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+    var marker = L.marker([35.228093027079076, -80.8396339416504]).addTo(map);
+
+    marker.bindPopup("<b>Charlotte, North Carolina</b><br>Charlotte is a major city and commercial hub in North Carolina. Its modern city center (Uptown) is home to the Levine Museum of the New South, which explores post–Civil War history in the South, and hands-on science displays at Discovery Place. Uptown is also known for the NASCAR Hall of Fame, which celebrates the sport of auto racing through interactive exhibits and films (Wikipedia).").openPopup();
+
+    </script>
+
+</body>
+</html>
