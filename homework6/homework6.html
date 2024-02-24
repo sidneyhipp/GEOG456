@@ -33,8 +33,6 @@ tr:nth-child(even) {
 
 </table>
 
-</body>
-
 <script>
   var x = document.getElementById('myTable')
 
@@ -46,12 +44,16 @@ tr:nth-child(even) {
     myCell1.innerText = data.features[i].properties.date;
     myCell2.innerText = data.features[i].properties.st;
     myCell3.innerText = data.features[i].properties.loss;
+    if (data.features[i].properties.loss == 0) {myRow.style.backgroundColor = 'green'};
+    if (data.features[i].properties.loss > 1) {myRow.style.backgroundColor = 'red'};
     myRow.append(myCell1)
     myRow.append(myCell2)
     myRow.append(myCell3)
     x.append(myRow)
   }
 </script>
+
+</body>
 
 </html>
 
