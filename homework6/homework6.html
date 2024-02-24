@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+</head>
+<script src="tornadoes.js"></script>
+<body>
+
+<h2>Loss from Tornadoes</h2>
+
+<table id = "myTable">
+  <tr>
+    <th>Date of Tornado</th>
+    <th>State</th>
+    <th>Amount of Loss</th>
+  </tr>
+
+</table>
+
+</body>
+
+<script>
+  var x = document.getElementById('myTable')
+
+  for (var i = 0; i < data.features.length; i++){
+    var myRow = document.createElement('tr');
+    var myCell1 = document.createElement('td');
+    var myCell2 = document.createElement('td');
+    var myCell3 = document.createElement('td');
+    myCell1.innerText = data.features[i].properties.date;
+    myCell2.innerText = data.features[i].properties.st;
+    myCell3.innerText = data.features[i].properties.loss;
+    myRow.append(myCell1)
+    myRow.append(myCell2)
+    myRow.append(myCell3)
+    x.append(myRow)
+  }
+</script>
+
+</html>
+
