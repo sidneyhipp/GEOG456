@@ -12,7 +12,7 @@
    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
    crossorigin=""></script>
 
-   <script src="tornadoes.js"></script>
+   <script src="2020_tornadoes.js"></script>
 </head>
 <style>
     #map { 
@@ -21,9 +21,9 @@
          }
 </style>
 <body>
-    <h1>Tornado Occurances in the US in 2000</h1>
+    <h1>Tornado Occurances in the US in 2020</h1>
     <h3 id ="daYear">Day</h3>
-    <input id="dateSlider" type = "range" name = "Day" min = "0" max = "120" oninput="moveSlider(this.value)">
+    <input id="dateSlider" type = "range" name = "Day" min = "0" max = "1081" oninput="moveSlider(this.value)">
     <div id="map"></div>
     <script>
 
@@ -45,7 +45,7 @@
         var greenIcon = new LeafIcon({iconUrl: 'gray-eye-catching-tornado-png-0.png'})
 
 
-        var geojson = L.geoJson(data.features[0],{
+        var geojson = L.geoJson(tornadoes.features[0],{
             pointToLayer: function(feature,latlng){
                 return L.marker(latlng,{icon: greenIcon})
             }
@@ -53,10 +53,10 @@
 
         function moveSlider(value) {
             map.removeLayer(geojson); // Remove the previous layer if it exists
-            var currentDate = data.features[value].properties.date; // Get the date of the current feature
+            var currentDate = tornadoes.features[value].properties.date; // Get the date of the current feature
             var featuresToAdd = []; // Array to store features with the same date
             // Loop through the features to find those with the same date
-            data.features.forEach(function(feature) {
+            tornadoes.features.forEach(function(feature) {
                 if (feature.properties.date === currentDate) {
                     featuresToAdd.push(feature); // Add feature to the array if its date matches the current date
                 }
