@@ -51,18 +51,33 @@
             }
         }).addTo(map);
 
-        function moveSlider(value) { // function called by the slider that uses the value to select one feature, using the index of the feature array. 
-            // console.log(value)
-            map.removeLayer(geojson);// leaflet method to remove a layer, otherwise you are just adding more features to the map
-            document.getElementById('daYear').innerHTML = 'Day ' + data.features[value].properties.date
-            geojson = L.geoJson(data.features[value],{
-                pointToLayer: function(feature,latlng){
-                    return L.marker(latlng,{icon: greenIcon})
-                }
-            })
-            map.addLayer(geojson); // add the new layer
-            
+        function moveSlider(value) {
+    map.removeLayer(geojson); // Remove the previous layer if it exists
+
+    var currentDate = data.features[value].properties.date; // Get the date of the current feature
+
+    var featuresToAdd = []; // Array to store features with the same date
+
+    // Loop through the features to find those with the same date
+    data.features.forEach(function(feature) {
+        if (feature.properties.date === currentDate) {
+            featuresToAdd.push(feature); // Add feature to the array if its date matches the current date
         }
+    });
+
+    // Create a GeoJSON layer with the features for the current date
+    geojson = L.geoJson(featuresToAdd, {
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, { icon: greenIcon });
+        }
+    });
+
+    map.addLayer(geojson); // Add the new layer to the map
+
+    // Update the displayed date
+    document.getElementById('daYear').innerHTML = 'Day ' + currentDate;
+}
+
         moveSlider(0) // start the map with the first feature
         window.onload = function() {
         document.getElementById('dateSlider').value = 0;  
