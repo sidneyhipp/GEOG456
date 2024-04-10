@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaflet with Slider</title>
+    <title>Leaflet with Proportional Symbols</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="crossorigin=""></script>
     
@@ -53,74 +53,62 @@
         <div class="legend"></div>
 
     <script>
-        //HW made by Colby Mask // Edited and annotated by J Arce
-
         var map = L.map('map').setView([30.293322656220493, -97.74882492684549], 10);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
         }).addTo(map);
 
-    
-        var selectedYear = '2012'
-        function myStyle(feature) {
-            // console.log(feature.properties[selectedYear]) //look at the console log and notice that selectedYear is the name of a property of the geojson, so this will give you the data for that feature. 
-            // console.log(getColor(feature.properties[selectedYear])) //look at the console log and notice that the selected year will result in a color. 
+        var selectedYear = '2012';
+        var markers = [];
 
-            return {
-            "fillColor": getColor(feature.properties[selectedYear]),
-            "color": "black",// notice that the selected year is the name of a property of the geojson
-            "weight": 0.75,
-            "opacity": 2.0,
-            "fillOpacity": 0.7
-            }
-        };
+        function createMarkers(data) {
+            data.features.forEach(function (feature) {
+                var marker = L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
+                    radius: Math.sqrt(feature.properties[selectedYear]) / 5000, // Adjust the scaling factor as needed
+                    fillColor: 'blue',
+                    color: 'black',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                });
+                markers.push(marker);
+            });
+        }
 
-        function getColor(waterConsumption) {
-            return waterConsumption < 5000000 ? "#f7fbff" 
-            :waterConsumption < 10000000 ? "#9ecae1" 
-            :waterConsumption < 50000000 ? "#4292c6"
-            : "#08306b";
-        };
+        function updateMarkers() {
+            markers.forEach(function (marker) {
+                map.addLayer(marker);
+            });
+        }
 
-        var austinWater = L.geoJSON(aws, {style: myStyle}).addTo(map);
+        function removeMarkers() {
+            markers.forEach(function (marker) {
+                map.removeLayer(marker);
+            });
+            markers = [];
+        }
 
         function moveSlider(value) {
-            selectedYear = value; // this changes the value of the selectedYear variable
-            map.removeLayer(austinWater);// leaflet method to remove a layer / 
-            austinWater = L.geoJSON(aws, {style: myStyle});
-            map.addLayer(austinWater); // add the new layer
-            document.getElementById('theYear').innerHTML = 'Year: '+ value  
+            selectedYear = value;
+            removeMarkers();
+            createMarkers(aws);
+            updateMarkers();
+            document.getElementById('theYear').innerHTML = 'Year: ' + value;
         }
-        moveSlider('2012')
 
-        // create a leaflet legend
+        moveSlider('2012');
+
+        // create a leaflet legend (you may need to modify this for proportional symbols)
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend'),
-                grades = [0, 5000000, 10000000, 50000000],
-                labels = [];
-
-            for (var i = 0; i < grades.length; i++) {
-                div.innerHTML +=
-                    '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + ' gal'+ '<br>' : '+ gal');
-            }
+            var div = L.DomUtil.create('div', 'info legend');
+            div.innerHTML += '<strong>Proportional Symbols Legend</strong><br>';
+            div.innerHTML += '<span style="background: blue; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></span> Water Use<br>';
             return div;
         };
         legend.addTo(map);
 
-        var legendTitle = L.control({position: 'bottomright'});
-            legendTitle.onAdd = function (map) {
-                this._div = L.DomUtil.create('div', 'info');
-                this.update();
-                return this._div;
-            };
-
-            legendTitle.update = function (props) {
-                this._div.innerHTML = '<h3><u>Total Water in Gallons</u></h3>';
-            };
-            legendTitle.addTo(map);
     </script>
     <ul>
         <li><a href="https://data.austintexas.gov/Utilities-and-City-Services/Austin-Water-Residential-Water-Consumption/sxk7-7k6z"><h3>Austin Water - Residential Water Consumption (CSV)</h3></a></li>

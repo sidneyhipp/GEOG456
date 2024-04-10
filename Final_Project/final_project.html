@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Web Map with Slider</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+       integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+       crossorigin=""/>
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+       integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+       crossorigin=""></script>
+
+    <style>
+        /* CSS styles for map container and slider */
+        #map { 
+            width: 60%;
+            height: 500px;
+        }
+        #dateSlider {
+            width: 30%;
+            margin: 10px 0;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
+
+    <script src="predation.js"></script>
+
+</head>
+<body>
+    <h1>Mesopredator Predation Probability around San Cristóbal Island</h1>
+    <h3 id="dateDisplay"></h3>
+    <!-- Slider input for date selection -->
+    <input id="dateSlider" type="range" name="Month" min="0" max="38" oninput="moveSlider(this.value)" value="0">
+    <!-- Map container -->
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([-0.8060952321492636, -89.44347381591798], 11);
+        // Add OpenStreetMap tiles to the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        function geojsonMarkerOptions(feature) {
+            return {
+                radius: getRadius(feature.properties.PredProbability),
+                fillColor: "#3355FF",
+                color: "#000",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 1 // Reduced fill opacity for better visibility
+            };
+        }
+
+        function getRadius(d) {
+            return d < 0.2 ? 2 :
+                   d < 0.4 ? 4 :
+                   d < 0.6 ? 6 :
+                   d < 0.8 ? 8 :
+                   d <= 1.0 ? 10 :
+                   0; // Default radius if no condition is met
+        }
+
+        var geojson; // Define GeoJSON layer as a global variable
+
+        function moveSlider(value) {
+            var currentDate = predation.features[value].properties.YearMonth; // Get the date of the current feature
+            // Update the displayed date
+            document.getElementById('dateDisplay').innerHTML = 'Date: ' + currentDate;
+
+            // Remove the previous layer if it exists
+            if (geojson) {
+                map.removeLayer(geojson);
+            }
+
+            // Create a new GeoJSON layer with the features for the current date
+            geojson = L.geoJSON(predation.features.filter(feature => feature.properties.YearMonth === currentDate), {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, geojsonMarkerOptions(feature));
+                }
+            }).addTo(map);
+        }
+
+        moveSlider(0); // Start the map with the first feature
+    </script>
+</body>
+</html>

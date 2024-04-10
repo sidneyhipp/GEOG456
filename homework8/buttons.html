@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        img {
+            position: absolute;
+        }
+
+        .visible {
+            visibility: visible;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        #text-container {
+            position: absolute;
+            top: 450px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .text {
+            font-size: 18px;
+        }
+
+        .year-container {
+            display: none;
+            position: absolute;
+            top: 420px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .year-container.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Compare UNC Football Stadium in 2012 vs 2020 from NAIP Imagery</h1>
+    <h2>Click Image to toggle between 2012 and 2020.</h2>
+    <div id="container" onclick="toggleImages()"> 
+        <img id="after" class="hidden" src="./images/2020.png" alt="" height="400px">
+        <div id="year-2012" class="year-container"> 
+            <h2>2020</h2>
+        </div>
+        <img id='before' class="visible" src="./images/2012.png" alt="" height="400px">
+        <div id="year-2020" class="year-container visible">
+            <h2>2012</h2>
+        </div>
+    </div>
+
+    <script>
+        function toggleImages() {
+            var visibleImg = document.querySelector('.visible');
+            var hiddenImg = document.querySelector('.hidden');
+            var year2012 = document.getElementById('year-2012');
+            var year2020 = document.getElementById('year-2020');
+
+            visibleImg.classList.add('hidden');
+            visibleImg.classList.remove('visible');
+            hiddenImg.classList.add('visible');
+            hiddenImg.classList.remove('hidden');
+
+            year2012.classList.toggle('visible');
+            year2020.classList.toggle('visible');
+        }
+    </script>
+</body>
+</html>
