@@ -89,23 +89,6 @@
     width: 20px;
     height: 20px;
 }
-#temperature-legend .legend-color {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    margin-right: 5px;
-    border: 1px solid #ccc;
-}
-
-#temperature-legend {
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    min-width: 250px; /* Consistent with other legend */
-    margin-top: 10px; /* Space between legends */
-}
-
     </style>
 
     <script src="predation.js"></script>
@@ -143,54 +126,6 @@
                 <span class="legend-text">80-100% PredProbability</span>
             </div>
         </div>
-        <!-- New Legend for Temperature -->
-        <div id="temperature-legend">
-            <h3>Temperature Color Legend</h3>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #1CD5FF;"></div>
-                <span class="legend-text">16°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #35C6EA;"></div>
-                <span class="legend-text">17°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #4EB7D5;"></div>
-                <span class="legend-text">18°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #68A9BF;"></div>
-                <span class="legend-text">19°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #819AAA;"></div>
-                <span class="legend-text">20°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #9A8B95;"></div>
-                <span class="legend-text">21°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #B37C80;"></div>
-                <span class="legend-text">22°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #CD6E6A;"></div>
-                <span class="legend-text">23°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #E65F55;"></div>
-                <span class="legend-text">24°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #E85D53;"></div>
-                <span class="legend-text">25°C</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #FF5040;"></div>
-                <span class="legend-text">26°C</span>
-            </div>
-</div>
     </div>
 </body>
 
@@ -213,7 +148,7 @@
         function geojsonMarkerOptions(feature) {
             return {
                 radius: getRadius(feature.properties.PredProbability),
-                fillColor: getColor(feature.properties.Temperature),
+                fillColor: "#3355FF",
                 color: "#000",
                 weight: 1,
                 opacity: 1,
@@ -230,27 +165,14 @@
                    0; // Default radius if no condition is met
         }
 
-        function getColor(e) {
-            return e === 16 ? "#1CD5FF" :
-                    e === 17 ? "#35C6EA" :
-                    e === 18 ? "#4EB7D5" :
-                    e === 19 ? "#68A9BF" : 
-                    e === 20 ? "#819AAA" :
-                    e === 21 ? "#9A8B95" :
-                    e === 22 ? "#B37C80" :
-                    e === 23 ? "#CD6E6A" :
-                    e === 24 ? "#E65F55" :
-                    e === 25 ? "#E85D53" :
-                    e === 26 ? "#FF5040" :
-                    0;
-        }
-
         var geojson; // Define GeoJSON layer as a global variable
 
         function moveSlider(value) {
             var currentDate = predation.features[value].properties.YearMonth; // Get the date of the current feature
+            var currentTemp = predation.features[value].properties.Temperature;
             // Update the displayed date
             document.getElementById('dateDisplay').innerHTML = 'Date: ' + currentDate;
+            document.getElementById('temperature').innerHTML = 'Temperature: ' + currentTemp + ' degrees Celsius'
 
             // Remove the previous layer if it exists
             if (geojson) {

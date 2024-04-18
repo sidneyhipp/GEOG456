@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Maps with GeoJSON</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        .map-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .map {
+            flex: 1;
+            height: 200px;
+            width: 500px;
+        }
+
+        .legend {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 18px;
+            color: #555;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            bottom: 20px;
+            width: 200px; /* Adjust the width as needed */
+        }
+
+        .legend-item {
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+        }
+
+        .map-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Adjust the position of legend for map1 */
+        #legend1 {
+            left: 20px;
+        }
+
+        /* Adjust the position of legend for map2 */
+        #legend2 {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <div>
+            <div class="map-title">Percent Asian</div>
+            <div id="map1" class="map"></div>
+            <div id="legend1" class="legend"> 
+                <div class="legend-item"><span class="legend-color" style="background-color: #E8E8E8;"></span> 0 or below</div>
+                <div class="legend-item"><span class="legend-color" style="background-color: #74ADC9;"></span> 0 to 2</div>
+                <div class="legend-item"><span class="legend-color" style="background-color: #0071AA;"></span> Above 2</div>
+            </div>
+        </div>
+        <div>
+            <div class="map-title">Percent American Indian</div>
+            <div id="map2" class="map"></div>
+            <div id="legend2" class="legend">
+                <div class="legend-item"><span class="legend-color" style="background-color: #E8E8E8;"></span> 0 or below</div>
+                <div class="legend-item"><span class="legend-color" style="background-color: #C974AD;"></span> 0 to 2</div>
+                <div class="legend-item"><span class="legend-color" style="background-color: #AA0071;"></span> Above 2</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="./data/county_percent.js"></script>
+    <script>
+        // Function to style the GeoJSON polygons based on their "pAsian" property
+        function style1(feature) {
+            var value = feature.properties.pAsian;
+            var color;
+            if (value <= 0) {
+                color = '#E8E8E8';
+            } else if (value <= 2) {
+                color = '#74ADC9';
+            } else {
+                color = '#0071AA';
+            }
+            return {
+                fillColor: color,
+                weight: 2,
+                opacity: 1,
+                color: 'black',
+                fillOpacity: 0.9
+            };
+        }
+
+        // Function to style the GeoJSON polygons based on their "p_Aind" property
+        function style2(feature) {
+            var value = feature.properties.p_Aind;
+            var color;
+            if (value <= 0) {
+                color = '#E8E8E8';
+            } else if (value <= 2) {
+                color = '#C974AD';
+            } else {
+                color = '#AA0071';
+            }
+            return {
+                fillColor: color,
+                weight: 2,
+                opacity: 1,
+                color: 'black',
+                fillOpacity: 0.9
+            };
+        }
+
+        // Create map 1 centered at North Carolina
+        var map1 = L.map('map1').setView([35.0822, -79], 6);
+
+        // Add a tile layer for map 1
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map1);
+
+        // Add GeoJSON layer for map 1 with style1 function
+        L.geoJSON(geojsonFeature, {
+            style: style1
+        }).addTo(map1);
+
+        // Create map 2 centered at North Carolina
+        var map2 = L.map('map2').setView([35.0822, -79], 6);
+
+        // Add a tile layer for map 2
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map2);
+
+        // Add GeoJSON layer for map 2 with style2 function
+        L.geoJSON(geojsonFeature, {
+            style: style2
+        }).addTo(map2);
+    </script>
+</body>
+</html>

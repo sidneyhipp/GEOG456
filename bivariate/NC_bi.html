@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map with GeoJSON</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+        }
+
+        .legend {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 18px;
+            color: #555;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .legend-item {
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="legend" class="legend">
+        <div class="legend-item"><span class="legend-color" style="background-color: blue;"></span> 0 or below</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: green;"></span> 0 to 2</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: red;"></span> Above 2</div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="./data/county_percent.js"></script>
+    <script>
+
+        // Using part of a Chat GPT 3.5 generated code, using the prompt "make the html for a leaflet that opens a polygon geojson and gives three colors based on values that 0, 0 to 2 and above 2. Place the centere in North Carolina
+        // Create a map centered at North Carolina"
+        var map = L.map('map').setView([35.7822, -80.7937], 7);
+
+        // Add a tile layer for the base map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+
+        // colors from 
+        //
+        var row3 = ['#74ADC9', '#6573AB', '#55398E']
+        var row2 = ['#AECBD9', '#9F91BB', '#8F579D']
+        var row1 = ['#E8E8E8', '#D9AECA', '#C974AD']
+
+        
+        // Function to style the GeoJSON polygons based on their value property
+        function style(feature) {
+            var valueA = feature.properties.pAsian;
+            var valueI = feature.properties.p_Aind;
+
+            var color;
+            if (valueA <= 0 & valueI <= 0) {
+                color = '#E8E8E8';
+            } else if (valueA <= 0 & valueI > 0 & valueI <= 2) {
+                color = '#D9AECA';
+            } 
+             else if (valueA <= 0 & valueI > 0 & valueI > 2) {
+                color = '#C974AD';
+            } 
+            else if (valueA > 0 & valueA <= 2 & valueI <= 0) {
+                color = '#AECBD9';
+            } 
+            else if (valueA > 0 & valueA <= 2 & valueI > 0 & valueI <= 2) {
+                color = '#9F91BB';
+            } 
+             else if (valueA > 0 & valueA <= 2 & valueI > 2) {
+                color = '#8F579D';
+            } 
+            else if (valueA > 2 & valueI <= 0) {
+                color = '#74ADC9';
+            } 
+            else if (valueA > 2 & valueI > 0 & valueI <= 2) {
+                color = '#6573AB';
+            } 
+             else if (valueA > 2 & valueI > 2) {
+                color = '#55398E';
+            } 
+            
+            else {
+                color = 'red';
+            }
+            return {
+                fillColor: color,
+                weight: 1,
+                opacity: 1,
+                color: 'black',
+                fillOpacity: 0.9
+            };
+        }
+
+        // Add the GeoJSON layer to the map with custom styling
+        L.geoJSON(geojsonFeature, {
+            style: style
+        }).addTo(map);
+    </script>
+</body>
+</html>
