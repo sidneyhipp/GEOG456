@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Web Map with Slider</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+          integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+          crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin=""></script>
+    <style>
+
+/* Style adjustments for centering and improving the layout */
+
+
+#poster {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center-align children */
+    margin: 20px; /* Add some margin for spacing */
+    background-color: #aadaff; /* Light background for the section */
+    padding: 20px; /* Padding around the content */
+    border-radius: 8px; /* Rounded corners for the section */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+body {
+    background-color: rgb(135, 230, 144);
+    font-family: Arial, sans-serif;
+    transform: scale(0.8);
+    transform-origin: top left; /* Anchor transformation to top left */
+    width: 125%; /* Increase width to compensate for the scaling */
+    height: 125%; /* Increase height to compensate for the scaling */
+    overflow-x: hidden; /* Hide horizontal scrollbar if necessary */
+}
+
+
+figure {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+figure img {
+    max-width: 100%; /* Ensure it scales on smaller screens */
+    height: auto; /* Maintain aspect ratio */
+}
+
+p {
+    text-align: justify; /* Justify text for better alignment */
+    padding: 0 15%; /* Padding on the sides for narrower text */
+    line-height: 1.6; /* Improved line height for readability */
+    font-size: 1.1em; /* Slightly larger font size */
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+}
+
+.map-div {
+    width: 50%;
+    padding: 20px;
+}
+
+#map1, #map2 {
+    height: 500px;
+}
+
+.title-slider {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#dateSlider {
+    width: 40%;
+    margin: auto;
+}
+
+.legend {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    display: flex;          /* Enable flexbox */
+    flex-direction: column; /* Stack legend items vertically */
+    align-items: center;    /* Center-align the items */
+}
+
+.legend-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 15px; /* Right margin on each item for spacing between columns */
+    margin-bottom: 10px; /* Bottom margin for space between rows if wrapping occurs */
+}
+
+.legend-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Ensure wrapping of items */
+}
+
+.legend-circle {
+    width: 20px; /* Initial size */
+    height: 20px; /* Initial size */
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 30px;
+    margin-bottom: 5px; /* Space below each circle */
+}
+
+    </style>
+</head>
+<body>
+
+    <div id="poster" style="display: block;">
+        <figure>
+            <img src="./BEM Poster.png" alt="Description of the image" height="1700px">
+        </figure>
+        <p>Temperature is one of the most important abiotic factors affecting processes across every biological level. The Galapagos archipelago is home to particular oceanographic conditions (e.g., intersection of major currents, seasonal upwelling, occurrence of El Nino events) which generate large temperature variation across space and time. The purpose of this study was to measure variation in fish assemblages across a spatial and temporal temperature gradient in the Galapagos. We did this by estimating fish species composition, abundance, and richness from videos taken in seven reef sites along the coast of San Cristobal. Videos were taken at each site every two months for one year, with three to four samples per site. Our results showed fish richness and abundance was lower during colder months for most sites. Additionally, fish assemblage structure was more similar between sites than between months from different sites. However, we also observed a clear differentiation between the warmer sites in the North and colder sites in the South part of the island. Observed temporal and spatial patterns suggest temperature, among other abiotic factors, could play an important role in structuring fish communities in the Galapagos. Determining how temperature influences these communities could help us better understand the future of reef habitats in the Galapagos.
+        </p>
+    </div>
+    
+
+    <div class="title-slider">
+        <h1>Species Richness and Abundance around San Cristóbal Island</h1>
+        <h3 id="dateDisplay">Select Date</h3>
+        <input id="dateSlider" type="range" min="0" max="29" value="0" oninput="moveSlider(this.value)">
+    </div>
+    <div class="container">
+        <div class="map-div" style="display: block;">
+            <h3>Species Richness Over Time</h3>
+            <div id="map1"></div>
+            <div id="legend1" class="legend"></div>
+        </div>        
+        <div class="map-div" style="display: block;">
+            <h3>Species Abundance Over Time</h3>
+            <div id="map2"></div>
+            <div id="legend2" class="legend"></div>
+        </div>
+    </div>
+
+    <script src="abundance_richness.js"></script>
+    <script>
+        var map1 = L.map('map1', {attributionControl: false // Disables the attribution control
+        }).setView([-0.8060952321492636, -89.44347381591798], 11);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        }).addTo(map1);
+
+        var map2 = L.map('map2', {attributionControl: false // Disables the attribution control
+        }).setView([-0.8060952321492636, -89.44347381591798], 11);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        }).addTo(map2);
+
+        var geojson1, geojson2; // Global variables for GeoJSON layers
+
+        function moveSlider(value) {
+            var currentDate = abun_rich.features[value].properties.Year_Month;
+            document.getElementById('dateDisplay').innerHTML = 'Date: ' + currentDate;
+
+            if (geojson1) map1.removeLayer(geojson1);
+            if (geojson2) map2.removeLayer(geojson2);
+
+            geojson1 = L.geoJSON(abun_rich.features.filter(f => f.properties.Year_Month === currentDate), {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, geojsonMarkerOptions1(feature));
+                }
+            }).addTo(map1);
+
+            geojson2 = L.geoJSON(abun_rich.features.filter(f => f.properties.Year_Month === currentDate), {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, geojsonMarkerOptions2(feature));
+                }
+            }).addTo(map2);
+        }
+
+        function geojsonMarkerOptions1(feature) {
+            return {
+                radius: calculateRadius1(feature.properties.richness_avg),
+                fillColor: getColor1(feature.properties.richness_avg),
+                color: getColor1(feature.properties.richness_avg),
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 1
+            };
+        }
+
+        function geojsonMarkerOptions2(feature) {
+            return {
+                radius: calculateRadius2(feature.properties.abundance_avg),
+                fillColor: getColor2(feature.properties.abundance_avg),
+                color: getColor2(feature.properties.abundance_avg),
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 1
+            };
+        }
+
+        function setupLegends() {
+            const legend1 = document.getElementById('legend1');
+            const legend2 = document.getElementById('legend2');
+            const sizes = [5, 10, 15, 20, 25]; // Sizes corresponding to data ranges
+            const rangeMidpoints1 = [2.5, 7.5, 12.5, 17.5, 22.5]; // Midpoints of the ranges for richness
+            const rangeMidpoints2 = [50, 150, 250, 350, 600]; // Midpoints of the ranges for abundance
+            const descriptions1 = ['0-4', '5-9', '10-14', '15-19', '20-25'];
+            const descriptions2 = ['0-99', '100-199', '200-299', '300-499', '500-650'];
+
+            // Clear previous legends
+            legend1.innerHTML = '<h4>Richness Legend</h4><div class="legend-row"></div>';
+            legend2.innerHTML = '<h4>Abundance Legend</h4><div class="legend-row"></div>';
+
+            sizes.forEach((size, index) => {
+                let legendRow1 = createLegendItem(size, rangeMidpoints1[index], descriptions1[index], getColor1);
+                let legendRow2 = createLegendItem(size, rangeMidpoints2[index], descriptions2[index], getColor2);
+                legend1.querySelector('.legend-row').appendChild(legendRow1);
+                legend2.querySelector('.legend-row').appendChild(legendRow2);
+            });
+        }
+
+        function createLegendItem(size, value, description, getColorFunction) {
+            let legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+
+            let circle = document.createElement('div');
+            circle.className = 'legend-circle';
+            circle.style.width = circle.style.height = size * 2 + 'px';  // Size is doubled for visual effect
+            circle.style.backgroundColor = getColorFunction(value); // Set color based on the midpoint value
+
+            let label = document.createElement('div');
+            label.innerText = description;
+
+            legendItem.appendChild(circle);
+            legendItem.appendChild(label);
+            return legendItem;
+        }
+
+
+
+
+        function calculateRadius1(value) {
+            return value < 5 ? 5 :
+                value < 10 ? 10 :
+                value < 15 ? 15 :
+                value < 20 ? 20 :
+                value <= 25 ? 25 :
+                0; // Default radius if no condition is met
+        }
+
+        function calculateRadius2(value) {
+            return value < 100 ? 5 :
+                value < 200 ? 10 :
+                value < 300 ? 15 :
+                value < 400 ? 20 :
+                value <= 700 ? 25 :
+                0; // Default radius if no condition is met
+        }
+
+        function getColor1(e) {
+            return e < 5 ? "#CFDDFE" :
+                e < 10 ? "#9EBBFD" :
+                e < 15 ? "#6E98FC" :
+                e < 20 ? "#3D76FB" :
+                e <= 25 ? "#0D54FA" :
+                0; // Default radius if no condition is met
+        }
+
+        function getColor2(e) {
+            return e < 100 ? "#F8CECE" :
+                e < 200 ? "#F19D9D" :
+                e < 300 ? "#EA6D6D" :
+                e < 400 ? "#E33C3C" :
+                e <= 700 ? "#DC0B0B" :
+                0; // Default radius if no condition is met
+        }
+
+        // Call setupLegends at the end of the moveSlider function or after initializing the map
+        setupLegends();
+
+        moveSlider(0); // Initialize maps
+    </script>
+</body>
+</html>
